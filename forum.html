@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المنتدى</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page" style="padding-top:76px;padding-bottom:110px;">
+  <div class="search-box">
+    <span>🔍</span>
+    <input type="text" id="search" placeholder="ابحث في المنتدى">
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;">
+    <span style="font-weight:700;">فرز حسب</span>
+  </div>
+  <div class="chip-row">
+    <span class="chip on" data-filter="">الكل</span>
+    <span class="chip" data-filter="مشهور">مشهور</span>
+    <span class="chip" data-filter="🌱 البسلة">🌱 البسلة</span>
+    <span class="chip" data-filter="🍐 الإجاص">🍐 الإجاص</span>
+  </div>
+
+  <div id="posts"></div>
+</div>
+
+<button class="fab" id="askBtn">✏️ اسأل المنتدى</button>
+
+<div class="overlay" id="askOverlay">
+  <div class="sheet">
+    <div class="handle"></div>
+    <h2 style="margin:0 0 14px;">اسأل المنتدى</h2>
+    <form id="askForm">
+      <label>عنوان السؤال</label>
+      <input type="text" id="qTitle" placeholder="مثال: النبتة عندي صفراء الورق" required>
+      <label>التفاصيل</label>
+      <textarea id="qBody" placeholder="اشرح المشكلة بالتفصيل..." required></textarea>
+      <label>المحصول المعني</label>
+      <select id="qCrop"></select>
+      <button class="btn btn-primary" style="margin-top:18px;">نشر السؤال</button>
+    </form>
+  </div>
+</div>
+
+<script src="js/crops.js"></script>
+<script src="js/app.js"></script>
+<script>
+renderTopbar({ title: "المنتدى", showCropChip:false, backHref:null });
+renderBottomNav("forum");
+
+const SEED_POSTS = [
+  {
+    author:"El Mohammady", country:"مصر", date:"8 مارس", crop:"🌱 البسلة",
+    title:"كيفية العناية بنبات مسك الليل",
+    body:"يوجد بداية أصفرار فى مقدمة اوراق النبات", answers:2, cover:null,
+  },
+  {
+    author:"خالد الوخيان", country:"الأردن", date:"25 فيفري", crop:"🌱 البسلة",
+    title:"ساعدني في تحديد المشكلة بوسم النبات",
+    body:"اكتشف بلانتكس مشكلة محتملة في البسلة عندي، بحاجة لتأكيد من مزارع آخر.", answers:0, cover:"🌿",
+  },
+  {
+    author:"خالد الوخيان", country:"الأردن", date:"25 فيفري", crop:"🌱 البسلة",
+    title:"النبتة عندي صفراء الورق",
+    body:"الورق اصفر والانتاج خفيف بالنسبة للبازيلاء", answers:1, cover:null,
+  },
+];
+
+function loadPosts(){
+  const custom = JSON.parse(localStorage.getItem("plantix_forum_posts") || "[]");
+  return [...custom, ...SEED_POSTS];
+}
+
+function paintPosts(filter, query){
+  const posts = loadPosts().filter(p => {
+    const matchFilter = !filter || filter === "مشهور" || p.crop === filter;
+    const matchQuery = !query || (p.title + p.body).includes(query);
+    return matchFilter && matchQuery;
+  });
+  document.getElementById("posts").innerHTML = posts.map(p => `
+    <div class="post">
+      ${p.cover ? `<div class="cover" style="height:170px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:3rem;">${p.cover}</div>` : ""}
+      <div class="body">
+        <div class="author">
+          <div class="avatar">👤</div>
+          <div>
+            <div class="name">${p.author} <span class="meta">• ${p.country}</span></div>
+            <div class="meta">${p.date} • ${p.crop}</div>
+          </div>
+        </div>
+        <h4>${p.title}</h4>
+        <p>${p.body}</p>
+        <div class="answers">${p.answers} إجابات · ترجمة</div>
+      </div>
+      <div class="actions">
+        <span>↗</span>
+        <span>👎 0</span>
+        <span>👍 0</span>
+      </div>
+    </div>
+  `).join("") || `<p class="muted" style="text-align:center;margin-top:40px;">لا توجد منشورات مطابقة</p>`;
+}
+
+let currentFilter = "";
+document.querySelectorAll(".chip[data-filter]").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".chip[data-filter]").forEach(c => c.classList.remove("on"));
+    chip.classList.add("on");
+    currentFilter = chip.dataset.filter;
+    paintPosts(currentFilter, document.getElementById("search").value);
+  });
+});
+document.getElementById("search").addEventListener("input", (e) => paintPosts(currentFilter, e.target.value));
+
+const askOverlay = document.getElementById("askOverlay");
+document.getElementById("askBtn").addEventListener("click", () => askOverlay.classList.add("open"));
+askOverlay.addEventListener("click", (e) => { if (e.target === askOverlay) askOverlay.classList.remove("open"); });
+
+const qCrop = document.getElementById("qCrop");
+qCrop.innerHTML = CROPS.map(c => `<option value="${c.emoji} ${c.name}">${c.emoji} ${c.name}</option>`).join("");
+
+document.getElementById("askForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const custom = JSON.parse(localStorage.getItem("plantix_forum_posts") || "[]");
+  custom.unshift({
+    author: "أنت", country: "الجزائر", date: "الآن", crop: qCrop.value,
+    title: document.getElementById("qTitle").value,
+    body: document.getElementById("qBody").value,
+    answers: 0, cover: null,
+  });
+  localStorage.setItem("plantix_forum_posts", JSON.stringify(custom));
+  askOverlay.classList.remove("open");
+  e.target.reset();
+  paintPosts(currentFilter, "");
+});
+
+paintPosts("", "");
+</script>
+</body>
+</html>

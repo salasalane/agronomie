@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ملفك الشخصي</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page" style="padding-top:76px;">
+  <div class="profile-head">
+    <div>
+      <div style="font-weight:800;">حسابك</div>
+      <p class="muted" style="margin:6px 0 14px;">انضم إلى منتدى بلانتكس</p>
+      <button class="btn btn-outline" id="loginBtn" style="width:auto;padding:12px 26px;">تسجيل الدخول</button>
+    </div>
+    <div class="avatar-big">👤</div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div class="icon-circle" style="background:var(--blue-bg);">⭐</div>
+      <div>
+        <div style="font-weight:700;">كيف هي تجربتك مع تطبيق بلانتكس؟</div>
+        <p class="muted" style="margin:4px 0 10px;">نود أن نسمع أفكارك واقتراحاتك.</p>
+        <a class="btn-ghost" href="#" onclick="openFeedbackSheet();return false;">اترك تقييماً</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div class="icon-circle">🌿</div>
+      <div>
+        <div style="font-weight:700;">ازرع بذكاء مع مزارعي العالم</div>
+        <p class="muted" style="margin:4px 0 10px;">قم بمشاركة بلانتكس وساعد المزارعين على حل مشاكل نباتاتهم ومحاصيلهم.</p>
+        <a class="btn-ghost" href="forum.html">شارك بلانتكس</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="loginOverlay">
+  <div class="sheet">
+    <div class="handle"></div>
+    <h2 style="margin:0 0 14px;">تسجيل الدخول</h2>
+    <form id="loginForm">
+      <label>رقم الهاتف أو البريد الإلكتروني</label>
+      <input type="text" required placeholder="أدخل بياناتك">
+      <label>كلمة المرور</label>
+      <input type="password" required placeholder="••••••••">
+      <button class="btn btn-primary" style="margin-top:18px;">دخول</button>
+    </form>
+  </div>
+</div>
+
+<script src="js/crops.js"></script>
+<script src="js/app.js"></script>
+<script>
+renderTopbar({ title: "Plantix", showCropChip:false, backHref:null });
+renderBottomNav("profile");
+
+const loginOverlay = document.getElementById("loginOverlay");
+document.getElementById("loginBtn").addEventListener("click", () => loginOverlay.classList.add("open"));
+loginOverlay.addEventListener("click", (e) => { if (e.target === loginOverlay) loginOverlay.classList.remove("open"); });
+document.getElementById("loginForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  loginOverlay.classList.remove("open");
+  alert("تم تسجيل الدخول (نسخة تجريبية).");
+});
+</script>
+</body>
+</html>

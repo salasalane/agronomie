@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الحاسبة الزراعية</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page" style="padding-top:76px;">
+  <div class="tabs" id="tabs">
+    <button data-tab="yield">الغلة</button>
+    <button data-tab="price">السعر</button>
+    <button data-tab="budget">الميزانية</button>
+    <button data-tab="profit">الربح</button>
+  </div>
+
+  <div id="tabContent"></div>
+
+  <div class="result-card" id="resultCard" style="display:none;">
+    <div class="label muted" id="resultLabel"></div>
+    <div class="value" id="resultValue"></div>
+  </div>
+</div>
+
+<script src="js/crops.js"></script>
+<script src="js/app.js"></script>
+<script>
+renderTopbar({ title: "الحاسبة الزراعية", showCropChip:false, backHref:"index.html" });
+renderBottomNav("crops");
+
+const FIELDS = {
+  yield: {
+    title: "الغلة المطلوبة",
+    desc: "كم تحتاج للحصاد لتغطية المصاريف؟",
+    inputs: [
+      { id:"expenses", label:"إجمالي المصاريف (دج)", ph:"مثال: 45000" },
+      { id:"price", label:"سعر البيع المتوقع (دج / كغ)", ph:"مثال: 30" },
+    ],
+    compute: v => v.price > 0 ? (v.expenses / v.price) : null,
+    unit: "كغ",
+    resultLabel: "الغلة المطلوبة لتغطية المصاريف",
+  },
+  price: {
+    title: "سعر عدم الخسارة",
+    desc: "أقل سعر يجب أن تبيع به لتجنب الخسارة",
+    inputs: [
+      { id:"expenses", label:"إجمالي المصاريف (دج)", ph:"مثال: 45000" },
+      { id:"yieldQty", label:"الغلة المتوقعة (كغ)", ph:"مثال: 1500" },
+    ],
+    compute: v => v.yieldQty > 0 ? (v.expenses / v.yieldQty) : null,
+    unit: "دج / كغ",
+    resultLabel: "أقل سعر لتجنب الخسارة",
+  },
+  budget: {
+    title: "الميزانية القصوى للمدخلات",
+    desc: "كم يمكنك إنفاقه على المدخلات؟",
+    inputs: [
+      { id:"revenue", label:"الإيراد المتوقع (دج)", ph:"مثال: 90000" },
+      { id:"desiredProfit", label:"الربح المطلوب (دج)", ph:"مثال: 20000" },
+    ],
+    compute: v => (v.revenue - v.desiredProfit),
+    unit: "دج",
+    resultLabel: "الميزانية القصوى المتاحة للمدخلات",
+  },
+  profit: {
+    title: "الربح التقديري",
+    desc: "كم ربح ستجنيه بعد تغطية المصاريف؟",
+    inputs: [
+      { id:"revenue", label:"الإيراد المتوقع (دج)", ph:"مثال: 90000" },
+      { id:"expenses", label:"إجمالي المصاريف (دج)", ph:"مثال: 45000" },
+    ],
+    compute: v => (v.revenue - v.expenses),
+    unit: "دج",
+    resultLabel: "الربح التقديري",
+  },
+};
+
+let activeTab = new URLSearchParams(location.search).get("tab") || "yield";
+
+function paintTab(){
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("active", b.dataset.tab===activeTab));
+  const cfg = FIELDS[activeTab];
+  const content = document.getElementById("tabContent");
+  content.innerHTML = `
+    <h2 class="section-title">${cfg.title}</h2>
+    <p class="muted" style="margin-top:-10px;">${cfg.desc}</p>
+    <form id="calcForm">
+      ${cfg.inputs.map(f => `<label>${f.label}</label><input type="number" step="any" min="0" id="${f.id}" placeholder="${f.ph}" required>`).join("")}
+      <button class="btn btn-primary" style="margin-top:20px;">احسب</button>
+    </form>
+  `;
+  document.getElementById("resultCard").style.display = "none";
+
+  document.getElementById("calcForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const values = {};
+    cfg.inputs.forEach(f => values[f.id] = parseFloat(document.getElementById(f.id).value) || 0);
+    const result = cfg.compute(values);
+    const card = document.getElementById("resultCard");
+    if (result === null || !isFinite(result)){
+      card.style.display = "block";
+      document.getElementById("resultLabel").textContent = "تعذّر الحساب — تحقق من القيم المدخلة";
+      document.getElementById("resultValue").textContent = "—";
+      return;
+    }
+    document.getElementById("resultLabel").textContent = cfg.resultLabel;
+    document.getElementById("resultValue").textContent = `${result.toLocaleString("ar")} ${cfg.unit}`;
+    card.style.display = "block";
+  });
+}
+
+document.querySelectorAll("#tabs button").forEach(b => b.addEventListener("click", () => { activeTab = b.dataset.tab; paintTab(); }));
+paintTab();
+</script>
+</body>
+</html>

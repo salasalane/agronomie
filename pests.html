@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الآفات والأمراض</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page" style="padding-top:76px;">
+  <h2 class="section-title" style="margin-top:0;">تنبيه الآفات والأمراض</h2>
+  <div class="alert-card">
+    <div style="font-size:2.4rem;">🌱</div>
+    <p class="muted" style="margin:10px 0 0;">حاليًا، لم يتم الإبلاغ عن أي آفات أو أمراض في محيطك.</p>
+  </div>
+
+  <h2 class="section-title">استكشاف الحقل</h2>
+  <p class="muted">افحص محاصيلك بانتظام لاكتشاف الآفات واتخاذ تدابير السيطرة في الوقت المناسب. يمكن أن تؤدي المراقبة الميدانية المستمرة إلى زيادة إنتاجية المحصول بنسبة 50%.</p>
+  <button class="btn btn-outline">تعلم المزيد</button>
+
+  <div id="byStage"></div>
+
+  <div class="diag-card">
+    <div style="font-size:1.6rem;">🩺</div>
+    <h3>تشخيص المحصول</h3>
+    <p class="muted">حدد مشكلة محصولك في بضع ثوان<br>حدد بسرعة المشكلة الدقيقة في محصولك.</p>
+    <button class="btn btn-primary" id="diagBtn" style="margin-top:10px;">🩺 ابدأ التشخيص</button>
+  </div>
+</div>
+
+<script src="js/crops.js"></script>
+<script src="js/app.js"></script>
+<script>
+renderTopbar({ title: "الآفات والأمراض", showCropChip:true, backHref:"index.html" });
+renderBottomNav("crops");
+
+const STAGE_DISEASES = {
+  "مرحلة الشتلات": [
+    { cat:"الفطريات", name:"العفن الأبيض", icon:"🍄" },
+    { cat:"الفطريات", name:"البياض الزغبي", icon:"🍃" },
+  ],
+  "مرحلة النمو": [
+    { cat:"الفطريات", name:"البياض الزغبي", icon:"🍃" },
+    { cat:"الفطريات", name:"البياض الدقيقى", icon:"🌿" },
+  ],
+  "مرحلة الحصاد": [
+    { cat:"الفطريات", name:"تعفن الساق", icon:"🥀" },
+    { cat:"الفطريات", name:"عفن البوتريتس (العفن الرمادى)", icon:"🍇" },
+  ],
+};
+
+const wrap = document.getElementById("byStage");
+wrap.innerHTML = Object.entries(STAGE_DISEASES).map(([stage, list]) => `
+  <div class="stage-head"><h3 style="margin:0;">${stage}</h3><a class="see-all" href="#">عرض الكل</a></div>
+  <div class="disease-scroll">
+    ${list.map(d => `
+      <div class="disease-card">
+        <div class="thumb">${d.icon}</div>
+        <div class="txt"><div class="cat">${d.cat}</div><div class="name">${d.name}</div></div>
+      </div>
+    `).join("")}
+  </div>
+`).join("");
+
+document.getElementById("diagBtn").addEventListener("click", () => {
+  alert("ميزة التشخيص عبر الصورة تتطلب التقاط صورة للنبتة — يمكن ربطها لاحقًا بخدمة تحليل صور.");
+});
+</script>
+</body>
+</html>

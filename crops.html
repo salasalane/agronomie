@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المحاصيل</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page" style="padding-top:76px;">
+  <h2 class="section-title" style="margin-top:0;">المحاصيل</h2>
+  <p class="muted">تعرّف على ظروف النمو المثلى، ومعايير التربة، والمحاصيل المرافقة، وتناوب المحاصيل لزراعة ناجحة.</p>
+
+  <div class="search-box" style="margin-top:16px;">
+    <span>🔍</span>
+    <input type="text" id="search" placeholder="بحث عن محصول">
+  </div>
+
+  <div class="crop-grid" id="grid" style="margin-top:18px;grid-template-columns:repeat(2,1fr);"></div>
+</div>
+
+<script src="js/crops.js"></script>
+<script src="js/app.js"></script>
+<script>
+renderTopbar({ title: "المحاصيل", showCropChip:false, backHref:"index.html" });
+renderBottomNav("crops");
+
+function paint(filter){
+  const grid = document.getElementById("grid");
+  const list = CROPS.filter(c => c.name.includes(filter || ""));
+  grid.innerHTML = list.map(c => `
+    <a class="crop-tile" style="border:1px solid var(--gray-border);border-radius:14px;padding:16px;" href="crop-detail.html?crop=${c.slug}">
+      <div class="emoji" style="width:70px;height:70px;font-size:2.2rem;">${c.emoji}</div>
+      <span>${c.name}</span>
+    </a>
+  `).join("") || `<p class="muted">لا توجد نتائج</p>`;
+}
+document.getElementById("search").addEventListener("input", (e) => paint(e.target.value));
+paint("");
+</script>
+</body>
+</html>

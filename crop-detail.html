@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فيشة المحصول</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page" style="padding-top:76px;">
+  <div class="crop-hero" id="hero"></div>
+
+  <h1 style="font-size:1.6rem;font-weight:800;" id="cropName"></h1>
+
+  <h3 class="subhead">ظروف النمو</h3>
+  <div class="info-grid" id="growthGrid"></div>
+
+  <h3 class="subhead">الزراعة</h3>
+  <div class="info-grid" id="agriGrid"></div>
+
+  <h3 class="subhead">معايير التربة</h3>
+  <div class="info-grid" id="soilGrid"></div>
+
+  <div class="spacing-diagram">
+    <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="#1967d2" stroke-width="1">
+        <line x1="10" y1="20" x2="10" y2="140"/>
+        <line x1="90" y1="20" x2="90" y2="140"/>
+        <line x1="170" y1="20" x2="170" y2="140"/>
+        <line x1="250" y1="20" x2="250" y2="140"/>
+      </g>
+      <g id="plantDots"></g>
+    </svg>
+    <div class="spacing-labels">
+      <span id="rowSpacingLbl">من صف إلى صف: —</span>
+      <span id="plantSpacingLbl">من نبات إلى نبات: —</span>
+    </div>
+  </div>
+  <div class="notice">ⓘ هذه معلومات عامة للمحصول. عدّل كثافة النباتات والمسافة حسب احتياجات صنفك.</div>
+
+  <h3 class="subhead">احتياجات المغذيات (لكل <span id="unitTxt">وحدة</span>)</h3>
+  <div class="npk-row">
+    <div><div class="k">K</div><div class="v" id="npkK">—</div></div>
+    <div><div class="k">P</div><div class="v" id="npkP">—</div></div>
+    <div><div class="k">N</div><div class="v" id="npkN">—</div></div>
+  </div>
+  <a class="btn btn-primary" href="fertilizer.html" style="margin-top:16px;display:block;text-align:center;">انظر في حاسبة الأسمدة</a>
+
+  <h3 class="subhead">المحاصيل المرافقة</h3>
+  <div class="companion">
+    <div class="badge good">✓</div>
+    <div><div class="k muted">المرافقة الجيدة</div><div id="goodList" style="font-weight:700;"></div></div>
+  </div>
+  <div class="companion">
+    <div class="badge bad">✕</div>
+    <div><div class="k muted">المرافقة السيئة</div><div id="badList" style="font-weight:700;"></div></div>
+  </div>
+  <div class="notice" style="margin-top:14px;">
+    ازرع المحاصيل المرافقة الجيدة بجانب محصولك الرئيسي لمساعدته على النمو بشكل أفضل أو لإبعاد الآفات والأمراض.
+    تجنب زراعة المحاصيل المرافقة السيئة بالقرب من محصولك الرئيسي لأنها قد تضر نموه أو تجذب الآفات والأمراض.
+  </div>
+</div>
+
+<script src="js/crops.js"></script>
+<script src="js/app.js"></script>
+<script>
+const slug = new URLSearchParams(location.search).get("crop") || currentCropSlug();
+const c = getCropBySlug(slug);
+setCurrentCropSlug(slug);
+
+renderTopbar({ title: c.name, showCropChip:false, backHref:"crops.html" });
+renderBottomNav("crops");
+
+document.getElementById("hero").textContent = c.emoji;
+document.getElementById("cropName").textContent = c.name;
+
+document.getElementById("growthGrid").innerHTML = `
+  <div class="info-cell"><div class="icon-circle">☀️</div><div><div class="label">التعرض</div><div class="val">شمس كاملة</div></div></div>
+  <div class="info-cell"><div class="icon-circle">🌡️</div><div><div class="label">درجة الحرارة</div><div class="val">${c.tempMin}-${c.tempMax} °C</div></div></div>
+  <div class="info-cell"><div class="icon-circle">💧</div><div><div class="label">الرطوبة النسبية</div><div class="val">${c.humidityMin}-${c.humidityMax} %</div></div></div>
+  <div class="info-cell"><div class="icon-circle">🌧️</div><div><div class="label">هطول الأمطار سنة</div><div class="val">${c.rainMin}-${c.rainMax} mm</div></div></div>
+  <div class="info-cell"><div class="icon-circle">💧</div><div><div class="label">الري</div><div class="val">${c.irrigation}</div></div></div>
+`;
+
+document.getElementById("agriGrid").innerHTML = `
+  <div class="info-cell"><div class="icon-circle">⏱️</div><div><div class="label">دورة الحياة</div><div class="val">${c.lifeCycle}</div></div></div>
+  <div class="info-cell"><div class="icon-circle">🤲</div><div><div class="label">العمل</div><div class="val">${c.labor}</div></div></div>
+  <div class="info-cell"><div class="icon-circle">🌱</div><div><div class="label">طريقة الزراعة</div><div class="val">${c.plantingMethod}</div></div></div>
+`;
+
+document.getElementById("soilGrid").innerHTML = `
+  <div class="info-cell"><div class="icon-circle">💠</div><div><div class="label">pH</div><div class="val">${c.phMin}-${c.phMax}</div></div></div>
+  <div class="info-cell"><div class="icon-circle">⚬</div><div><div class="label">التربة</div><div class="val">${c.soilType}</div></div></div>
+`;
+
+document.getElementById("rowSpacingLbl").textContent = `من صف إلى صف: ${c.rowSpacing}`;
+document.getElementById("plantSpacingLbl").textContent = `من نبات إلى نبات: ${c.plantSpacing}`;
+
+const dots = document.getElementById("plantDots");
+const cols = [10, 90, 170, 250];
+let dotSvg = "";
+[35, 80, 125].forEach((y, ri) => {
+  cols.forEach((x) => { dotSvg += `<circle cx="${x}" cy="${y}" r="4" fill="#1967d2"/>`; });
+});
+dots.innerHTML = dotSvg;
+
+document.getElementById("unitTxt").textContent = c.unit;
+document.getElementById("npkK").textContent = `${c.npk.k[1]}-${c.npk.k[0]} g/${c.unit}`;
+document.getElementById("npkP").textContent = `${c.npk.p[1]}-${c.npk.p[0]} g/${c.unit}`;
+document.getElementById("npkN").textContent = `${c.npk.n[1]}-${c.npk.n[0]} g/${c.unit}`;
+
+document.getElementById("goodList").textContent = c.companionGood.length ? c.companionGood.join(", ") : "لا توجد بيانات";
+document.getElementById("badList").textContent = c.companionBad.length ? c.companionBad.join(", ") : "لا توجد بيانات";
+</script>
+</body>
+</html>

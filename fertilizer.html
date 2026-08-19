@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حاسبة الأسمدة</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page" style="padding-top:76px;">
+  <h2 class="section-title" style="margin-top:0;">كميات المغذيات</h2>
+  <a href="#" class="btn-ghost" id="editRangeBtn" style="font-weight:700;">تعديل</a>
+
+  <div class="field-row" style="margin-top:14px;">
+    <div class="pill-value" id="valK">— K</div>
+    <div class="pill-value" id="valP">— P</div>
+    <div class="pill-value" id="valN">— N</div>
+  </div>
+
+  <h2 class="section-title" style="margin-top:26px;">عدد <span id="unitLabel">الأشجار</span></h2>
+  <div class="stepper">
+    <button id="incBtn">+</button>
+    <div class="box"><span id="countVal">0</span><small id="unitLabel2">الأشجار</small></div>
+    <button id="decBtn">−</button>
+  </div>
+
+  <button class="btn btn-primary" id="calcBtn" disabled>احسب</button>
+
+  <div class="result-card" id="resultCard" style="display:none;">
+    <div class="muted">الاحتياج الإجمالي من المغذيات</div>
+    <div style="display:flex;justify-content:space-around;margin-top:12px;">
+      <div><div class="value" id="totalK">0</div><small class="muted">K (g)</small></div>
+      <div><div class="value" id="totalP">0</div><small class="muted">P (g)</small></div>
+      <div><div class="value" id="totalN">0</div><small class="muted">N (g)</small></div>
+    </div>
+  </div>
+
+  <div style="margin-top:26px;">
+    <p class="muted" style="text-align:center;">ما مدى فائدة هذه الأداة بالنسبة لك؟</p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn btn-outline" style="width:auto;padding:10px 18px;" onclick="openFeedbackSheet()">👍 مفيدة</button>
+      <button class="btn btn-outline" style="width:auto;padding:10px 18px;" onclick="openFeedbackSheet()">👎 غير مفيدة</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/crops.js"></script>
+<script src="js/app.js"></script>
+<script>
+renderTopbar({ title: "حاسبة الأسمدة", showCropChip:true, backHref:"index.html" });
+renderBottomNav("crops");
+
+let treeCount = 0;
+
+function paintRanges(){
+  const c = getCropBySlug(currentCropSlug());
+  document.getElementById("valK").textContent = `${c.npk.k[1]}-${c.npk.k[0]} K`;
+  document.getElementById("valP").textContent = `${c.npk.p[1]}-${c.npk.p[0]} P`;
+  document.getElementById("valN").textContent = `${c.npk.n[1]}-${c.npk.n[0]} N`;
+  document.getElementById("unitLabel").textContent = c.unit === "شجرة" ? "الأشجار" : `الوحدات (${c.unit})`;
+  document.getElementById("unitLabel2").textContent = c.unit === "شجرة" ? "الأشجار" : c.unit;
+  document.getElementById("resultCard").style.display = "none";
+}
+
+window.onCropChanged = paintRanges;
+
+document.getElementById("incBtn").addEventListener("click", () => {
+  treeCount++;
+  document.getElementById("countVal").textContent = treeCount;
+  document.getElementById("calcBtn").disabled = treeCount <= 0;
+});
+document.getElementById("decBtn").addEventListener("click", () => {
+  treeCount = Math.max(0, treeCount - 1);
+  document.getElementById("countVal").textContent = treeCount;
+  document.getElementById("calcBtn").disabled = treeCount <= 0;
+});
+
+document.getElementById("calcBtn").addEventListener("click", () => {
+  const c = getCropBySlug(currentCropSlug());
+  const avg = (arr) => (arr[0] + arr[1]) / 2;
+  const totalK = Math.round(avg(c.npk.k) * treeCount);
+  const totalP = Math.round(avg(c.npk.p) * treeCount);
+  const totalN = Math.round(avg(c.npk.n) * treeCount);
+  document.getElementById("totalK").textContent = totalK.toLocaleString("ar");
+  document.getElementById("totalP").textContent = totalP.toLocaleString("ar");
+  document.getElementById("totalN").textContent = totalN.toLocaleString("ar");
+  document.getElementById("resultCard").style.display = "block";
+});
+
+document.getElementById("editRangeBtn").addEventListener("click", (e) => {
+  e.preventDefault();
+  document.getElementById("cropChipBtn").click();
+});
+
+paintRanges();
+</script>
+</body>
+</html>

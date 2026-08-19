@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>استشاري المحاصيل</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page" style="padding-top:76px;">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span>📅</span>
+    <span>تاريخ البذر</span>
+    <input type="date" id="seedDate" style="border:none;font-weight:700;font-size:1rem;">
+  </div>
+
+  <div class="tabs">
+    <button data-mode="stage" class="active">حسب المرحلة</button>
+    <button data-mode="task">حسب المهمة</button>
+  </div>
+
+  <div id="content"></div>
+</div>
+
+<script src="js/crops.js"></script>
+<script src="js/app.js"></script>
+<script>
+renderTopbar({ title: "استشاري المحاصيل", showCropChip:true, backHref:"index.html" });
+renderBottomNav("crops");
+
+const STAGES = [
+  { key:"pre",   name:"ما قبل الشتلات", weeksLabel:"4 أسابيع قبل البذر", past:true },
+  { key:"seedling", name:"مرحلة الشتلات", weeksLabel:"الاسبوع 1 - 6" },
+  { key:"growth", name:"مرحلة النمو", weeksLabel:"الاسبوع 7 - 14" },
+  { key:"harvest", name:"مرحلة الحصاد", weeksLabel:"الاسبوع 15 - 18" },
+];
+
+const WEEK_TASKS = [
+  { chip:"الزراعة", title:"تجهيز الحضانة", icon:"🪴" },
+  { chip:"حماية النباتات: كيميائية", chipClass:"blue", title:"معالجة البذور لتعزيز بقاء الشتلات", icon:"💧" },
+  { chip:"الري", title:"ري منتظم للشتلات", icon:"🚿" },
+  { chip:"اختيار الموقع", title:"اختيار موقع مشمس وجيد الصرف", icon:"🧭" },
+];
+
+const TASK_CATEGORIES = [
+  { icon:"🌾", name:"اختيار النباتات" },
+  { icon:"🌱", name:"الزراعة" },
+  { icon:"🔍", name:"المراقبة" },
+  { icon:"📍", name:"اختيار الموقع" },
+  { icon:"🚜", name:"تجهيز الحقل" },
+  { icon:"🌿", name:"إزالة الأعشاب الضارة (التعشيب)" },
+  { icon:"💧", name:"الري" },
+  { icon:"🧴", name:"التسميد: كيميائي" },
+  { icon:"🛡️", name:"اجراء وقائي" },
+  { icon:"🧪", name:"حماية النباتات: كيميائية" },
+  { icon:"🌸", name:"حماية النباتات: عضوية" },
+];
+
+let mode = "stage";
+document.getElementById("seedDate").valueAsDate = new Date();
+
+function paint(){
+  const content = document.getElementById("content");
+  if (mode === "stage"){
+    content.innerHTML = STAGES.map((s,i) => `
+      <div class="week-block" style="${s.past ? 'opacity:.5;' : ''}">
+        <span class="tag">${s.past ? 'المهام الماضية' : (i===1 ? 'المهام الحالية' : 'المهام القادمة')}</span>
+        <h4>${s.name}<br><span style="font-weight:800;">${s.weeksLabel}</span></h4>
+        ${i===1 ? WEEK_TASKS.map(t => `
+          <div class="task">
+            <div class="icon-circle">${t.icon}</div>
+            <div>
+              <span class="chip ${t.chipClass||''}">${t.chip}</span>
+              <div class="title">${t.title}</div>
+              <a href="#">اقرأ المزيد</a>
+            </div>
+          </div>
+        `).join("") : `<p class="muted">اطلع على "حسب المهمة" لرؤية كل المهام بالتفصيل.</p>`}
+      </div>
+    `).join("");
+  } else {
+    content.innerHTML = TASK_CATEGORIES.map(t => `
+      <div class="task-list-row">
+        <div class="left"><div class="icon-circle">${t.icon}</div>${t.name}</div>
+        <span>‹</span>
+      </div>
+    `).join("");
+  }
+}
+
+document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".tabs button").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  mode = b.dataset.mode;
+  paint();
+}));
+
+paint();
+</script>
+</body>
+</html>

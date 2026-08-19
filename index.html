@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الحاسبة الزراعية</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page" style="padding-top:70px;">
+  <h1 style="font-size:1.8rem;font-weight:800;margin:0 0 22px;">الحاسبة الزراعية</h1>
+  <h2 class="section-title">ماذا تريد حسابه؟</h2>
+
+  <div class="grid-2">
+    <a class="calc-card" href="farm-calculator.html?tab=yield">
+      <div class="icon-circle">💍</div>
+      <h3>الغلة المطلوبة</h3>
+      <p>كم تحتاج للحصاد لتغطية المصاريف</p>
+    </a>
+    <a class="calc-card" href="farm-calculator.html?tab=price">
+      <div class="icon-circle">🏪</div>
+      <h3>سعر عدم الخسارة</h3>
+      <p>أقل سعر يجب أن تبيع به لتجنب الخسارة</p>
+    </a>
+    <a class="calc-card" href="farm-calculator.html?tab=budget">
+      <div class="icon-circle">₹</div>
+      <h3>الميزانية القصوى للمدخلات</h3>
+      <p>كم يمكنك إنفاقه على المدخلات</p>
+    </a>
+    <a class="calc-card" href="farm-calculator.html?tab=profit">
+      <div class="icon-circle">✨</div>
+      <h3>الربح التقديري</h3>
+      <p>كم ربح ستجنيه بعد تغطية المصاريف</p>
+    </a>
+  </div>
+
+  <div class="hero-banner">
+    <div style="font-size:2.2rem;">🌾💹</div>
+    <h3>الحسابات الأخيرة</h3>
+    <p>ستظهر حساباتك الأخيرة هنا. قارن بينها لمعرفة تأثير تغيّر الغلة أو</p>
+    <p>السعر أو المصاريف على الربح.</p>
+  </div>
+
+  <div style="margin-top:26px;">
+    <h2 class="section-title">أدوات أخرى</h2>
+    <div class="grid-2">
+      <a class="calc-card" href="fertilizer.html">
+        <div class="icon-circle">🧪</div>
+        <h3>حاسبة الأسمدة</h3>
+        <p>احسب احتياجات NPK لمحصولك</p>
+      </a>
+      <a class="calc-card" href="consultant.html">
+        <div class="icon-circle">🗓️</div>
+        <h3>استشاري المحاصيل</h3>
+        <p>خطة مهام أسبوعية حسب تاريخ البذر</p>
+      </a>
+      <a class="calc-card" href="pests.html">
+        <div class="icon-circle">🐛</div>
+        <h3>الآفات والأمراض</h3>
+        <p>تنبيه واستكشاف الحقل وتشخيص المحصول</p>
+      </a>
+      <a class="calc-card" href="crops.html">
+        <div class="icon-circle">📚</div>
+        <h3>دليل المحاصيل</h3>
+        <p>ظروف النمو والتربة والمحاصيل المرافقة</p>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="js/crops.js"></script>
+<script src="js/app.js"></script>
+<script>
+  renderTopbar({ title: "الحاسبة الزراعية", showCropChip:false, backHref:null });
+  renderBottomNav("crops");
+</script>
+</body>
+</html>
